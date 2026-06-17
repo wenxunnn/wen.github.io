@@ -1,71 +1,61 @@
 /* ============================================================================
-   THE CATALYST CASE — game engine
+   THE MARSH INQUIRY — game engine
    ----------------------------------------------------------------------------
    This file is split into two parts:
 
-     1. CONFIGURATION  — edit the story, cards, answers, hints, and unlock order.
-     2. ENGINE          — rendering, state, and event wiring.
+     1. CONFIGURATION  — everything you're likely to want to edit:
+        card list, answers, hints, and what each clue unlocks.
 
-   The site is GitHub Pages friendly: HTML + CSS + JS only.
-   Progress is saved in localStorage so a refresh does not reset the game.
+     2. ENGINE          — rendering, state, and event wiring.
+        You usually won't need to touch this part.
+
+   State is saved to localStorage so progress survives a page refresh.
 ============================================================================ */
 
 
 /* ============================================================================
-   1. CONFIGURATION — edit this section for your mystery
+   1. CONFIGURATION
 ============================================================================ */
 
 /* ---- Case board cards, in display order ----
-   key            : unique id, also used as the unlock token
+   key            : unique id, also used as the "unlock token"
    screen         : id of the <section> to show when the card is opened
    title / sub    : text shown on the case-file card
    alwaysUnlocked : true for cards available from the very start
 */
 const CARDS = [
   { key: "background", screen: "screen-background", title: "Letter from Dr. Soto", sub: "Background & request for help", alwaysUnlocked: true },
-  { key: "clue1",       screen: "screen-clue1",       title: "Cipher Lock", sub: "A locked access panel", alwaysUnlocked: true },
-  { key: "autopsy",     screen: "screen-autopsy",     title: "Autopsy Report", sub: "Temperature, injuries, examiner notes" },
-  { key: "police",      screen: "screen-police",      title: "Police Report", sub: "Witnesses, alibis, access log" },
-  { key: "research",    screen: "screen-research",    title: "Research Archive", sub: "Sponsor data, sample labels, catalyst notes" },
-  { key: "messages",    screen: "screen-messages",    title: "Recovered Messages", sub: "Deleted chat fragments and aliases" },
-  { key: "final",       screen: "screen-final",       title: "Final Verdict", sub: "Name the murderer" },
+  { key: "clue1",       screen: "screen-clue1",       title: "Cipher Lock",          sub: "A locked access panel",        alwaysUnlocked: true },
+  { key: "autopsy",     screen: "screen-autopsy",     title: "Autopsy Report",       sub: "Medical examiner's file" },
+  { key: "police",      screen: "screen-police",      title: "Police Report",        sub: "Witnesses, alibis, keycard log" },
+  { key: "research",    screen: "screen-research",    title: "Company Ledger",       sub: "Audit trail & expense records" },
+  { key: "final",       screen: "screen-final",       title: "Final Verdict",        sub: "Name the murderer" },
 ];
 
 /* ---- What unlocks what ----
-   Solving a clue unlocks the card with this key.
-   You can change the progression here.
+   solving clueX unlocks the card with this key.
+   "final" being solved unlocks the ending screen automatically.
 */
 const UNLOCKS = {
   clue1: "autopsy",
   clue2: "police",
   clue3: "research",
-  clue4: "messages",
-  clue5: "final",
+  clue4: "final",
   final: "ending",
 };
 
-/* ---- Hints shown when the player taps "Hint" ----
-   Hints are intentionally subtle. Make them clearer if your players get stuck.
-*/
+/* ---- Hints shown when the player taps "Hint" ---- */
 const HINTS = {
-  clue1: "The blank spaces are part of the lock, not decoration. Some Roman endings take more room than others.",
-  clue2: "A cold body tells time differently depending on the calendar.",
-  clue3: "Do not read the statements alone. Put the time beside the access log and the seminar schedule.",
-  clue4: "The archive has two almost-matching stories: the label that was printed, and the job that actually ran.",
-  clue5: "One sender tried to become invisible by using a surface-science nickname. The nickname itself says where to look.",
+  clue1: "Count the blank spaces. VII is 3 letters, IX is 2 letters. X = 10 each. Figure out how many X's plus which suffix fits each blank count, then put the values in size order.",
+  clue2: "Subtract the body temperature from the normal body temperature, then divide by the cooling rate per hour. That tells you how many hours before the 11:00 PM exam death occurred — count backward from there.",
+  clue3: "Look at the time of death you just found. Whose name appears on the security log inside the Study Wing at that exact time — and does that match what they told police?",
+  clue4: "Compare each row of the raw accounting log to the printed expense summary. Three rows match perfectly. One doesn't.",
 };
 
 /* ---- Answer checking ----
    Each function takes the player's raw text input and returns true/false.
-   Helper functions are defined in the ENGINE section below.
-
-   Editable solution summary:
-   clue1 answer: 27, 17, 39 / XXVII, XVII, XXXIX
-   clue2 answer: 4:00 PM
-   clue3 answer: Adrian Cole
-   clue4 answer: NI-2289 or 2289
-   clue5 answer: terrace, step, or edge
-   final answer: Adrian Cole
+   Helper functions (normalize, romanToInt, parseTimeToMinutes) are defined
+   in the ENGINE section below.
 */
 const CHECKERS = {
   clue1: function (raw) {
@@ -86,22 +76,17 @@ const CHECKERS = {
 
   clue3: function (raw) {
     const n = normalize(raw);
-    return n.includes("adrian") || n.includes("cole") || n.includes("adrian cole");
+    return n.includes("daniel") || n.includes("whitlock");
   },
 
   clue4: function (raw) {
-    const n = raw.toLowerCase().replace(/[^a-z0-9]/g, "");
-    return n.includes("ni2289") || n.includes("2289");
-  },
-
-  clue5: function (raw) {
-    const n = normalize(raw);
-    return n.includes("terrace") || n.includes("step") || n.includes("edge");
+    const n = raw.toLowerCase().replace(/[\s-]/g, "");
+    return n.includes("2289");
   },
 
   final: function (raw) {
     const n = normalize(raw);
-    return n.includes("adrian") || n.includes("cole") || n.includes("adrian cole");
+    return n.includes("daniel") || n.includes("whitlock");
   },
 };
 
@@ -115,18 +100,18 @@ const MESSAGES = {
 
 
 /* ============================================================================
-   2. ENGINE — you usually should not need to edit below this line
+   2. ENGINE — you shouldn't need to edit below this line
 ============================================================================ */
 
-const STORAGE_KEY = "catalystCaseState_v3_nonacademic";
-const CLUE_KEYS = ["clue1", "clue2", "clue3", "clue4", "clue5"];
+const STORAGE_KEY = "marshInquiryState";
 
 function defaultState() {
   const unlocked = {};
   CARDS.forEach((c) => { unlocked[c.key] = !!c.alwaysUnlocked; });
-  const solved = { final: false };
-  CLUE_KEYS.forEach((key) => { solved[key] = false; });
-  return { unlocked: unlocked, solved: solved };
+  return {
+    unlocked: unlocked,
+    solved: { clue1: false, clue2: false, clue3: false, clue4: false, final: false },
+  };
 }
 
 function loadState() {
@@ -153,35 +138,38 @@ let state = loadState();
 /* ---- small parsing helpers ---- */
 
 function normalize(str) {
-  return String(str || "")
+  return str
     .toLowerCase()
-    .replace(/^(dr|prof|mr|mrs|ms)\.?\s+/g, "")
-    .replace(/[^a-z0-9\s]/g, " ")
-    .replace(/\s+/g, " ")
+    .replace(/^(dr|mr|mrs|ms)\.?\s+/g, "")
+    .replace(/[^a-z0-9\s]/g, "")
     .trim();
 }
 
 function romanToInt(str) {
   const map = { i: 1, v: 5, x: 10, l: 50, c: 100, d: 500, m: 1000 };
-  const s = String(str || "").toLowerCase();
+  const s = str.toLowerCase();
   if (!/^[ivxlcdm]+$/.test(s)) return null;
   let total = 0;
   for (let i = 0; i < s.length; i++) {
     const cur = map[s[i]];
     const next = map[s[i + 1]];
-    if (next && cur < next) total -= cur;
-    else total += cur;
+    if (next && cur < next) {
+      total -= cur;
+    } else {
+      total += cur;
+    }
   }
   return total;
 }
 
 function parseNumberToken(tok) {
   if (/^\d+$/.test(tok)) return parseInt(tok, 10);
-  return romanToInt(tok);
+  const roman = romanToInt(tok);
+  return roman;
 }
 
 function parseTimeToMinutes(raw) {
-  const s = String(raw || "").trim().toLowerCase().replace(/\s+/g, "");
+  const s = raw.trim().toLowerCase().replace(/\s+/g, "");
   let m;
 
   m = s.match(/^(\d{1,2}):(\d{2})(am|pm)?$/);
@@ -230,7 +218,9 @@ function renderCards() {
         '<p class="card-sub">' + card.sub + '</p>' +
       '</div>' +
       (unlocked ? "" : '<div class="card-stamp">Classified</div>');
-    if (unlocked) div.addEventListener("click", () => showScreen(card.screen));
+    if (unlocked) {
+      div.addEventListener("click", () => showScreen(card.screen));
+    }
     grid.appendChild(div);
   });
 }
@@ -238,7 +228,7 @@ function renderCards() {
 function renderProgress() {
   const dots = document.getElementById("progressDots");
   dots.innerHTML = "";
-  CLUE_KEYS.forEach((key) => {
+  ["clue1", "clue2", "clue3", "clue4"].forEach((key) => {
     const dot = document.createElement("span");
     dot.className = "progress-dot" + (state.solved[key] ? " filled" : "");
     dots.appendChild(dot);
@@ -261,14 +251,17 @@ function showScreen(id) {
 function handleSubmit(clueKey) {
   const input = document.getElementById("input-" + clueKey);
   const feedback = document.getElementById("feedback-" + clueKey);
-  const raw = input ? input.value : "";
+  const raw = input.value || "";
+
   const isCorrect = CHECKERS[clueKey](raw);
 
   if (isCorrect) {
     feedback.textContent = clueKey === "final" ? MESSAGES.finalCorrect : MESSAGES.correct;
     feedback.className = "feedback correct";
 
-    if (clueKey !== "final") state.solved[clueKey] = true;
+    if (clueKey !== "final") {
+      state.solved[clueKey] = true;
+    }
     const unlockKey = UNLOCKS[clueKey];
     if (unlockKey) state.unlocked[unlockKey] = true;
     saveState();
@@ -325,7 +318,7 @@ document.querySelectorAll('.answer-box input[type="text"]').forEach((input) => {
 });
 
 /* restore feedback text if a puzzle was already solved before a refresh */
-CLUE_KEYS.forEach((key) => {
+["clue1", "clue2", "clue3", "clue4"].forEach((key) => {
   if (state.solved[key]) {
     const feedback = document.getElementById("feedback-" + key);
     if (feedback) {

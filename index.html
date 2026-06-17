@@ -1,363 +1,279 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>The Catalyst Case</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=Special+Elite&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Case File #4471 — The Ashbourne Inquiry</title>
+<link rel="stylesheet" href="style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
-  <header class="topbar">
-    <div class="topbar-inner">
-      <div class="case-stamp">THE <span>CATALYST</span> CASE</div>
-      <div class="progress-track" aria-label="Case progress">
-        <span class="progress-label">EVIDENCE UNLOCKS</span>
-        <div class="progress-dots" id="progressDots"></div>
-      </div>
+
+<!-- ============================================================
+     TOP BAR — persists across all screens
+============================================================ -->
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="case-stamp">CASE FILE <span>#4471</span></div>
+    <div class="progress-track" id="progressTrack" aria-label="Case progress">
+      <span class="progress-label">LEADS UNCOVERED</span>
+      <div class="progress-dots" id="progressDots"></div>
     </div>
-  </header>
+  </div>
+</header>
 
-  <main id="app">
-    <!-- =========================================================
-         HOMEPAGE / CASE BOARD
-         Edit the title and intro text here.
-    ========================================================== -->
-    <section class="screen" id="screen-dashboard">
-      <div class="intro-letter">
-        <p class="intro-kicker">Encrypted request received</p>
-        <h1>Death at the Harbor</h1>
-        <p class="intro-sub">A 30-minute online case file with chemistry clues, but not an academic murder story.</p>
-        <button class="btn btn-primary" id="btnOpenLetter">Open Soto's Letter</button>
-      </div>
+<main id="app">
 
+  <!-- ============================================================
+       SCREEN: DASHBOARD
+  ============================================================ -->
+  <section class="screen" id="screen-dashboard">
+    <div class="intro-letter">
+      <p class="intro-kicker">A request has reached your team</p>
+      <h1>The Ashbourne Inquiry</h1>
+      <p class="intro-sub">Ashbourne Hall &mdash; confidential case archive</p>
+      <button class="btn btn-ghost" id="btnOpenLetter">Open the letter</button>
+    </div>
+
+    <div class="board" id="board">
       <h2 class="board-heading">Case Board</h2>
-      <p class="board-help">Open unlocked files. Solve each file's access question to reveal the next piece of evidence.</p>
-      <div class="card-grid" id="cardGrid"></div>
+      <p class="board-help">Tap a file to open it. Locked files will unlock as your team solves each lead.</p>
+      <div class="card-grid" id="cardGrid"><!-- cards injected by script.js --></div>
+    </div>
 
-      <div class="dashboard-footer">
-        <button class="btn btn-text" id="btnReset">Reset progress</button>
+    <div class="dashboard-footer">
+      <button class="btn btn-text" id="btnReset">Reset case (testing)</button>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       SCREEN: BACKGROUND / LETTER FROM REQUESTER
+  ============================================================ -->
+  <section class="screen hidden" id="screen-background">
+    <button class="btn btn-back" data-back>&larr; Back to Case Board</button>
+    <article class="file-sheet letter-sheet">
+      <p class="file-tag">Incoming Correspondence</p>
+      <h2>A Request For Help</h2>
+      <p class="letter-line">CONFIDENTIAL — CASE FILE #4471</p>
+      <p class="letter-line">Requesting Party: Margaret Hale, Family Attorney</p>
+      <hr class="rule">
+      <p>To the Investigation Team,</p>
+      <p>My name is Margaret Hale. I've served as the Ashford family's attorney for almost twenty years, and I'm reaching out because I don't trust how quickly this case was closed.</p>
+      <p>Four nights ago, <strong>Theodore Ashford</strong> &mdash; founder of Ashford Specialty Catalysts and owner of Ashbourne Hall &mdash; was found dead in his study by his housekeeper, just before midnight. The official report calls it a tragic fall. The family wants it left at that.</p>
+      <p>I don't believe that's the whole story.</p>
+      <p>Theodore had asked me, privately, to review the company's books before the dinner that evening. He told me he'd found "irregularities" and that he intended to settle the matter quietly with the family before he announced who would take over the company. That conversation was supposed to happen after dinner. It never did.</p>
+      <p>I've gathered what I could before anyone thought to stop me: the medical examiner's summary, the police report, the estate's security log, and the company's own financial records. I'm locking each file behind a puzzle, because I'm afraid that if the wrong person reaches this archive first, the truth will quietly disappear &mdash; the way Theodore's "irregularities" so nearly did.</p>
+      <p>You are, by every account, the best detective team there is. Please &mdash; find out what really happened to Theodore that night.</p>
+      <p class="letter-sign">&mdash; Margaret Hale</p>
+    </article>
+  </section>
+
+  <!-- ============================================================
+       SCREEN: CLUE 1 — ROMAN NUMERAL CIPHER (entry lock)
+  ============================================================ -->
+  <section class="screen hidden" id="screen-clue1">
+    <button class="btn btn-back" data-back>&larr; Back to Case Board</button>
+    <article class="file-sheet">
+      <p class="file-tag">The Study Safe &mdash; Locked</p>
+      <h2>Combination Lock</h2>
+      <p>Margaret left a note taped to the safe in Theodore's study:</p>
+      <blockquote class="riddle-block">
+        I&rsquo;m thinking of three Roman numerals.<br><br>
+        They all follow the same rule: each one is made from a block of X&rsquo;s, followed by either VII or IX.<br><br>
+        The second number is the smallest, and the third number is the largest.<br><br>
+        1st number: _ _ _ _ _<br>
+        2nd number: _ _ _ _<br>
+        3rd number: _ _ _ _ _<br><br>
+        What are the three numbers?
+      </blockquote>
+      <p class="hint-note">Use your Roman numeral cheat sheet. Answers may be entered as Roman numerals or regular numbers, in order, separated by commas.</p>
+
+      <div class="answer-box" data-clue="clue1">
+        <label for="input-clue1">Enter the three numbers, in order:</label>
+        <input type="text" id="input-clue1" placeholder="e.g. XXVII, XVII, XXXIX  or  27, 17, 39" autocomplete="off">
+        <div class="answer-actions">
+          <button class="btn btn-primary" data-submit="clue1">Submit</button>
+          <button class="btn btn-hint" data-hint="clue1">Hint</button>
+        </div>
+        <p class="hint-text hidden" id="hint-clue1"></p>
+        <p class="feedback" id="feedback-clue1"></p>
       </div>
-    </section>
+    </article>
+  </section>
 
-    <!-- =========================================================
-         BACKGROUND STORY
-         Month clue is hidden here: July 17.
-    ========================================================== -->
-    <section class="screen hidden" id="screen-background">
-      <button class="btn btn-back" data-back>&larr; Back to Case Board</button>
-      <article class="file-sheet">
-        <p class="file-tag">File 00 / Request Letter</p>
-        <h2>Letter from Elena Soto</h2>
-        <p class="letter-line">To: External Detective Team</p>
-        <p class="letter-line">Subject: Restricted assistance request / Harbor House fundraiser</p>
-        <hr class="rule" />
-        <p>You were recommended as the best team I could contact without alerting the local press. A guest at the Harbor House clean-energy fundraiser, <strong>Clara Bell</strong>, was found dead in a private archive room. The first report called it a collapse after a fall. I do not believe that is correct.</p>
-        <p>Clara was not part of the research staff. She was an investigative writer hired to prepare a public story about a new catalyst start-up. Before the gala, she told me she had found a mismatch between a shiny investor pitch and the original catalyst data behind it.</p>
-        <p>I compiled the evidence into this secure case board. The files are locked because the person responsible still has influence over the event website, sponsor folders, and uploaded press materials. Nothing here requires expert chemistry, but a few research habits and catalyst words may matter.</p>
+  <!-- ============================================================
+       SCREEN: AUTOPSY REPORT (contains Clue 2)
+  ============================================================ -->
+  <section class="screen hidden" id="screen-autopsy">
+    <button class="btn btn-back" data-back>&larr; Back to Case Board</button>
+    <article class="file-sheet">
+      <p class="file-tag">Medical Examiner's File</p>
+      <h2>Examination Summary</h2>
+      <table class="data-table">
+        <tr><th>Subject</th><td>Theodore Ashford, 68</td></tr>
+        <tr><th>Examination time</th><td>11:00&nbsp;PM</td></tr>
+        <tr><th>Cause of death</th><td>Blunt head trauma consistent with a fall</td></tr>
+        <tr><th>Body temperature at exam</th><td>33.0&deg;C</td></tr>
+        <tr><th>Normal living body temperature</th><td>37.2&deg;C</td></tr>
+        <tr><th>Estimated post-mortem cooling rate</th><td>0.6&deg;C per hour</td></tr>
+        <tr><th>Stomach contents</th><td>Partially digested, consistent with a meal taken mid-afternoon</td></tr>
+        <tr><th>Toxicology</th><td>No alcohol or medication detected</td></tr>
+      </table>
+      <p class="examiner-note">Examiner's note: "The cooling pattern is textbook. If you want to know when he died, the temperature tells you &mdash; you just have to do the subtraction."</p>
 
-        <div class="note-card">
-          <p><strong>Recovered invitation card from Clara's bag:</strong></p>
-          <p class="inline-code">Harbor House Clean-Energy Gala — Thursday, July 17 — Catalyst demo rehearsal at 2:30 PM</p>
-          <p class="small-print">The card was photographed because one corner had glove powder and a faint smear from a sample label.</p>
+      <div class="answer-box" data-clue="clue2">
+        <label for="input-clue2">Using the figures above, what time did Theodore die? (e.g. 4:00 PM)</label>
+        <input type="text" id="input-clue2" placeholder="e.g. 4:00 PM or 16:00" autocomplete="off">
+        <div class="answer-actions">
+          <button class="btn btn-primary" data-submit="clue2">Submit</button>
+          <button class="btn btn-hint" data-hint="clue2">Hint</button>
         </div>
+        <p class="hint-text hidden" id="hint-clue2"></p>
+        <p class="feedback" id="feedback-clue2"></p>
+      </div>
+    </article>
+  </section>
 
-        <h3>Primary suspects</h3>
-        <div class="suspect-grid">
-          <div class="suspect-card">
-            <p class="suspect-name">Adrian Cole</p>
-            <p class="suspect-role">Start-up broker / sponsor representative</p>
-            <p class="suspect-quote">“I was on a sponsor call before the rehearsal. I never went near the archive.”</p>
-          </div>
-          <div class="suspect-card">
-            <p class="suspect-name">Dr. Rina Park</p>
-            <p class="suspect-role">Catalysis researcher / invited demo presenter</p>
-            <p class="suspect-quote">“I was setting up the nickel-on-platinum demo. I barely knew Clara.”</p>
-          </div>
-          <div class="suspect-card">
-            <p class="suspect-name">Marcus Chen</p>
-            <p class="suspect-role">Event AV and server technician</p>
-            <p class="suspect-quote">“Everyone blames the person with admin access, but I was fixing the livestream.”</p>
-          </div>
-          <div class="suspect-card">
-            <p class="suspect-name">Lila Moreno</p>
-            <p class="suspect-role">Fundraiser coordinator</p>
-            <p class="suspect-quote">“Clara threatened to cancel the sponsor story, but that was not my decision.”</p>
-          </div>
+  <!-- ============================================================
+       SCREEN: POLICE REPORT (contains Clue 3)
+  ============================================================ -->
+  <section class="screen hidden" id="screen-police">
+    <button class="btn btn-back" data-back>&larr; Back to Case Board</button>
+    <article class="file-sheet">
+      <p class="file-tag">Police Report</p>
+      <h2>Incident Report &amp; Witness Statements</h2>
+
+      <h3>Suspect statements</h3>
+      <div class="suspect-grid">
+        <div class="suspect-card">
+          <p class="suspect-name">Daniel Whitlock</p>
+          <p class="suspect-role">Son-in-law &middot; works in the company's finance office</p>
+          <p class="suspect-quote">"I left the house around 2:30 and went for a long drive to clear my head. I was alone the rest of the afternoon."</p>
         </div>
-
-        <p class="letter-sign">— Elena Soto, private insurance investigator</p>
-      </article>
-    </section>
-
-    <!-- =========================================================
-         CLUE 1: ROMAN NUMERAL PUZZLE
-    ========================================================== -->
-    <section class="screen hidden" id="screen-clue1">
-      <button class="btn btn-back" data-back>&larr; Back to Case Board</button>
-      <article class="file-sheet">
-        <p class="file-tag">File 01 / Cipher Lock</p>
-        <h2>Access Panel: Roman Numerals</h2>
-        <p>The first protected file is sealed behind a low-tech lock. Soto left a Roman numeral cheat sheet with the physical props.</p>
-
-        <div class="riddle-block">
-          <p>I’m thinking of three Roman numerals.</p>
-          <p>They all follow the same rule: each one is made from a block of X’s, followed by either VII or IX.</p>
-          <p>The second number is the smallest, and the third number is the largest.</p>
-          <p>1st number: _ _ _ _ _<br>
-             2nd number: _ _ _ _<br>
-             3rd number: _ _ _ _ _</p>
-          <p>What are the three numbers?</p>
+        <div class="suspect-card">
+          <p class="suspect-name">Olivia Ashford</p>
+          <p class="suspect-role">Daughter &middot; company Vice President</p>
+          <p class="suspect-quote">"I was on the garden terrace taking calls about the merger from about 6:30 until just after 9. The security log should confirm that."</p>
         </div>
-
-        <div class="answer-box" data-clue="clue1">
-          <label for="input-clue1">Enter the three numbers or Roman numerals:</label>
-          <input id="input-clue1" type="text" placeholder="Example: 12, 9, 20" autocomplete="off" />
-          <div class="answer-actions">
-            <button class="btn btn-primary" data-submit="clue1">Submit</button>
-            <button class="btn btn-hint" data-hint="clue1">Hint</button>
-          </div>
-          <p class="hint-text hidden" id="hint-clue1"></p>
-          <p class="feedback" id="feedback-clue1"></p>
+        <div class="suspect-card">
+          <p class="suspect-name">Richard Pruitt</p>
+          <p class="suspect-role">Theodore's longtime business partner &middot; recently sidelined</p>
+          <p class="suspect-quote">"I was at my own home all afternoon, rehearsing a toast I never got to give. I never came near Ashbourne Hall that day."</p>
         </div>
-      </article>
-    </section>
-
-    <!-- =========================================================
-         CLUE 2: AUTOPSY / BODY TEMPERATURE PROP
-         Answer: 4:00 PM
-         Players need the physical monthly cooling-rate chart.
-    ========================================================== -->
-    <section class="screen hidden" id="screen-autopsy">
-      <button class="btn btn-back" data-back>&larr; Back to Case Board</button>
-      <article class="file-sheet">
-        <p class="file-tag">File 02 / Medical Examiner</p>
-        <h2>Autopsy and Medical Report</h2>
-        <p>The medical file is intentionally brief. The examiner's note says the death window can be estimated, but only if the correct field guide is used.</p>
-
-        <table class="data-table">
-          <tr><th>Victim</th><td>Clara Bell</td></tr>
-          <tr><th>Medical examination time</th><td>11:00 PM</td></tr>
-          <tr><th>Normal body temperature</th><td>37.0 °C</td></tr>
-          <tr><th>Body temperature at examination</th><td>29.65 °C</td></tr>
-          <tr><th>Visible trauma</th><td>Minor contusion near right temple; consistent with a fall after incapacitation</td></tr>
-          <tr><th>Toxicology screen</th><td>Trace sedative detected; source unknown</td></tr>
-        </table>
-
-        <div class="note-card red">
-          <p><strong>Examiner note:</strong> The body was found in an air-conditioned archive room. Use the month-specific cooling guide from the physical evidence packet. The cooling-rate guide was not uploaded to prevent tampering.</p>
+        <div class="suspect-card">
+          <p class="suspect-name">Marta Lin</p>
+          <p class="suspect-role">Theodore's executive assistant of twenty years</p>
+          <p class="suspect-quote">"I left for the pharmacy around 5. I can show you the receipt."</p>
         </div>
+      </div>
 
-        <p class="examiner-note">The exact date was not typed into this report. Soto's first letter may contain the calendar detail the examiner left out.</p>
+      <h3>Ashbourne Hall security log &mdash; night of the incident</h3>
+      <table class="data-table log-table">
+        <tr><th>Time</th><th>Name</th><th>Door</th></tr>
+        <tr><td>3:55&nbsp;PM</td><td>D. Whitlock</td><td>Study Wing &mdash; IN</td></tr>
+        <tr><td>4:10&nbsp;PM</td><td>D. Whitlock</td><td>Study Wing &mdash; OUT</td></tr>
+        <tr><td>5:02&nbsp;PM</td><td>M. Lin</td><td>Main Hall &mdash; OUT</td></tr>
+        <tr><td>6:40&nbsp;PM</td><td>O. Ashford</td><td>Garden Terrace &mdash; IN</td></tr>
+        <tr><td>9:15&nbsp;PM</td><td>O. Ashford</td><td>Garden Terrace &mdash; OUT</td></tr>
+        <tr><td>11:48&nbsp;PM</td><td>Housekeeper</td><td>Study Wing &mdash; IN (body discovered)</td></tr>
+      </table>
+      <p class="examiner-note">Note: R. Pruitt's access fob has no recorded entries for the entire day &mdash; consistent with being off the property.</p>
 
-        <div class="answer-box" data-clue="clue2">
-          <label for="input-clue2">Estimated time of death:</label>
-          <input id="input-clue2" type="text" placeholder="Example: 5:30 PM" autocomplete="off" />
-          <div class="answer-actions">
-            <button class="btn btn-primary" data-submit="clue2">Submit</button>
-            <button class="btn btn-hint" data-hint="clue2">Hint</button>
-          </div>
-          <p class="hint-text hidden" id="hint-clue2"></p>
-          <p class="feedback" id="feedback-clue2"></p>
+      <div class="answer-box" data-clue="clue3">
+        <label for="input-clue3">Whose statement contradicts the security log at the established time of death?</label>
+        <input type="text" id="input-clue3" placeholder="Enter a name" autocomplete="off">
+        <div class="answer-actions">
+          <button class="btn btn-primary" data-submit="clue3">Submit</button>
+          <button class="btn btn-hint" data-hint="clue3">Hint</button>
         </div>
-      </article>
-    </section>
+        <p class="hint-text hidden" id="hint-clue3"></p>
+        <p class="feedback" id="feedback-clue3"></p>
+      </div>
+    </article>
+  </section>
 
-    <!-- =========================================================
-         CLUE 3: POLICE REPORT / ALIBI CHECK
-         Answer: Adrian Cole
-    ========================================================== -->
-    <section class="screen hidden" id="screen-police">
-      <button class="btn btn-back" data-back>&larr; Back to Case Board</button>
-      <article class="file-sheet">
-        <p class="file-tag">File 03 / Police Report</p>
-        <h2>Witnesses, Alibis, and Access Log</h2>
-        <p>Local police initially treated the death as a private-event accident. Soto flagged the timeline because the guest-badge system and witness statements do not line up.</p>
+  <!-- ============================================================
+       SCREEN: COMPANY LEDGER (contains Clue 4)
+  ============================================================ -->
+  <section class="screen hidden" id="screen-research">
+    <button class="btn btn-back" data-back>&larr; Back to Case Board</button>
+    <article class="file-sheet">
+      <p class="file-tag">Ashford Specialty Catalysts &mdash; Finance Office</p>
+      <h2>Quarterly Ledger &amp; Audit Trail</h2>
+      <p>The quarterly expense summary presented to the family and the board listed the following totals:</p>
 
-        <h3>Witness statements</h3>
-        <div class="suspect-grid">
-          <div class="suspect-card">
-            <p class="suspect-name">Adrian Cole</p>
-            <p class="suspect-role">Claimed location</p>
-            <p class="suspect-quote">“From 3:45 to 4:20, I was upstairs on a sponsor call. My badge stayed with me.”</p>
-          </div>
-          <div class="suspect-card">
-            <p class="suspect-name">Rina Park</p>
-            <p class="suspect-role">Claimed location</p>
-            <p class="suspect-quote">“I was in the demo room preparing catalyst sample labels for visitors.”</p>
-          </div>
-          <div class="suspect-card">
-            <p class="suspect-name">Marcus Chen</p>
-            <p class="suspect-role">Claimed location</p>
-            <p class="suspect-quote">“I was on a support call after the livestream server stalled.”</p>
-          </div>
-          <div class="suspect-card">
-            <p class="suspect-name">Lila Moreno</p>
-            <p class="suspect-role">Claimed location</p>
-            <p class="suspect-quote">“I was in the lobby arranging donor seating before the rehearsal.”</p>
-          </div>
+      <table class="data-table">
+        <tr><th>Expense category</th><th>Reported total</th></tr>
+        <tr><td>Equipment maintenance</td><td>$42,000</td></tr>
+        <tr><td>Raw material purchases</td><td>$158,000</td></tr>
+        <tr><td>Marketing &amp; travel</td><td>$39,000</td></tr>
+        <tr><td>Contractor fees</td><td>$51,000</td></tr>
+      </table>
+
+      <p>The accounting system keeps its own independent entry log, separate from the printed summary:</p>
+
+      <table class="data-table log-table">
+        <tr><th>Entry ID</th><th>User</th><th>Logged</th><th>Amount</th></tr>
+        <tr><td>LED-2287</td><td>dwhitlock</td><td>3 weeks before incident</td><td>$42,000</td></tr>
+        <tr><td>LED-2288</td><td>dwhitlock</td><td>3 weeks before incident</td><td>$158,000</td></tr>
+        <tr><td>LED-2289</td><td>dwhitlock</td><td>3 weeks before incident</td><td>$97,000</td></tr>
+        <tr><td>LED-2310</td><td>dwhitlock</td><td>2 weeks before incident</td><td>$39,000</td></tr>
+      </table>
+      <p class="examiner-note">System note: entry <strong>LED-2289</strong> was reopened and re-saved by user <code>dwhitlock</code> two days after Theodore ordered the external audit &mdash; the same week he told Margaret he'd found "irregularities." Every other entry matches the printed summary exactly.</p>
+
+      <div class="answer-box" data-clue="clue4">
+        <label for="input-clue4">Which Entry ID holds the falsified amount?</label>
+        <input type="text" id="input-clue4" placeholder="e.g. LED-2289" autocomplete="off">
+        <div class="answer-actions">
+          <button class="btn btn-primary" data-submit="clue4">Submit</button>
+          <button class="btn btn-hint" data-hint="clue4">Hint</button>
         </div>
+        <p class="hint-text hidden" id="hint-clue4"></p>
+        <p class="feedback" id="feedback-clue4"></p>
+      </div>
+    </article>
+  </section>
 
-        <h3>Guest-badge and schedule extract</h3>
-        <table class="data-table log-table">
-          <tr><th>Time</th><th>Record</th><th>Name</th></tr>
-          <tr><td>3:46 PM</td><td>Archive room opened</td><td>Clara Bell</td></tr>
-          <tr><td>3:58 PM</td><td>Service corridor door opened</td><td>Adrian Cole</td></tr>
-          <tr><td>4:02 PM</td><td>Archive side exit opened</td><td>Adrian Cole</td></tr>
-          <tr><td>4:06 PM</td><td>Demo sample cabinet opened</td><td>Rina Park</td></tr>
-          <tr><td>4:12 PM</td><td>Livestream server login</td><td>Marcus Chen</td></tr>
-          <tr><td>4:18 PM</td><td>Lobby seating scanner used</td><td>Lila Moreno</td></tr>
-          <tr><td>4:30 PM</td><td>Rehearsal attendance scan</td><td>Adrian Cole</td></tr>
-        </table>
+  <!-- ============================================================
+       SCREEN: FINAL ACCUSATION
+  ============================================================ -->
+  <section class="screen hidden" id="screen-final">
+    <button class="btn btn-back" data-back>&larr; Back to Case Board</button>
+    <article class="file-sheet final-sheet">
+      <p class="file-tag">Final Verdict</p>
+      <h2>Who Killed Theodore Ashford?</h2>
+      <p>Your team has the security log, the time of death, the contradicted alibi, and the falsified ledger entry. It's time to name the person responsible.</p>
 
-        <div class="note-card">
-          <p><strong>Rehearsal schedule:</strong> The catalyst demo rehearsal began at 4:15 PM. Attendance was scanned at the door, but late arrivals were allowed.</p>
+      <div class="answer-box" data-clue="final">
+        <label for="input-final">Type the murderer's full name:</label>
+        <input type="text" id="input-final" placeholder="Enter a name" autocomplete="off">
+        <div class="answer-actions">
+          <button class="btn btn-primary" data-submit="final">Accuse</button>
         </div>
+        <p class="feedback" id="feedback-final"></p>
+      </div>
+    </article>
+  </section>
 
-        <div class="answer-box" data-clue="clue3">
-          <label for="input-clue3">Whose alibi is contradicted by the calculated death time?</label>
-          <input id="input-clue3" type="text" placeholder="Enter a suspect name" autocomplete="off" />
-          <div class="answer-actions">
-            <button class="btn btn-primary" data-submit="clue3">Submit</button>
-            <button class="btn btn-hint" data-hint="clue3">Hint</button>
-          </div>
-          <p class="hint-text hidden" id="hint-clue3"></p>
-          <p class="feedback" id="feedback-clue3"></p>
-        </div>
-      </article>
-    </section>
+  <!-- ============================================================
+       SCREEN: ENDING
+  ============================================================ -->
+  <section class="screen hidden" id="screen-ending">
+    <button class="btn btn-back" data-back>&larr; Back to Case Board</button>
+    <article class="file-sheet ending-sheet">
+      <p class="file-tag">Case Closed</p>
+      <h2>The Truth</h2>
+      <p>Daniel Whitlock had been quietly siphoning company funds through inflated contractor invoices to cover a string of gambling debts. When Theodore ordered an outside audit of the books, the gap surfaced &mdash; and Theodore decided to settle it privately with the family rather than involve the police, at least until he'd heard Daniel out.</p>
+      <p>Daniel got to him first. The security log places him in the study at 3:55&nbsp;PM &mdash; exactly when the examiner says Theodore died &mdash; despite his statement that he'd left hours earlier. He begged Theodore to keep it quiet; Theodore refused. In the confrontation that followed, Theodore fell and struck his head. Daniel staged the scene to look like an accident, then went back into the books to quietly patch the number he'd faked.</p>
+      <p>He didn't count on the accounting system keeping its own independent record &mdash; or on a detective team that knew how to read one.</p>
+      <p class="ending-signoff">Case #4471: Closed.</p>
+    </article>
+  </section>
 
-    <!-- =========================================================
-         CLUE 4: RESEARCH ARCHIVE / SAMPLE ID
-         Answer: NI-2289
-    ========================================================== -->
-    <section class="screen hidden" id="screen-research">
-      <button class="btn btn-back" data-back>&larr; Back to Case Board</button>
-      <article class="file-sheet">
-        <p class="file-tag">File 04 / Sponsor Archive</p>
-        <h2>Catalyst Data and Investor Labels</h2>
-        <p>The sponsor archive contains a polished investor summary and a raw computational record. Someone wanted the summary to look boring enough that no one would ask questions.</p>
+</main>
 
-        <h3>Printed catalyst sample labels</h3>
-        <table class="data-table log-table">
-          <tr><th>Sample</th><th>Public label</th><th>Display note</th></tr>
-          <tr><td>NI-1176</td><td>Ni/Pt baseline</td><td>Routine calibration</td></tr>
-          <tr><td>NI-2289</td><td>NiO/Pt failed surface</td><td>Do not feature in investor story</td></tr>
-          <tr><td>NI-3094</td><td>NiOH/Pt control</td><td>Stable after relaxation</td></tr>
-          <tr><td>NI-4410</td><td>Pt blank</td><td>Clean substrate</td></tr>
-        </table>
-
-        <h3>Raw computational record</h3>
-        <table class="data-table log-table">
-          <tr><th>Folder</th><th>Surface</th><th>Result</th><th>Uploaded through</th></tr>
-          <tr><td>calc_1176</td><td>Ni/Pt baseline</td><td>matches summary</td><td>Demo team</td></tr>
-          <tr><td>calc_2289</td><td>NiO/Pt corrected surface</td><td>promising after correction; not failed</td><td>Adrian Cole sponsor portal</td></tr>
-          <tr><td>calc_3094</td><td>NiOH/Pt control</td><td>matches summary</td><td>Rina Park</td></tr>
-          <tr><td>calc_4410</td><td>Pt blank</td><td>matches summary</td><td>Event archive</td></tr>
-        </table>
-
-        <div class="note-card red">
-          <p><strong>Recovered note from Clara:</strong> “The public label for one nickel sample is false. The raw job is the one that matters. Ask why Adrian buried it.”</p>
-        </div>
-
-        <div class="answer-box" data-clue="clue4">
-          <label for="input-clue4">Which sample ID was misrepresented?</label>
-          <input id="input-clue4" type="text" placeholder="Example: NI-0000" autocomplete="off" />
-          <div class="answer-actions">
-            <button class="btn btn-primary" data-submit="clue4">Submit</button>
-            <button class="btn btn-hint" data-hint="clue4">Hint</button>
-          </div>
-          <p class="hint-text hidden" id="hint-clue4"></p>
-          <p class="feedback" id="feedback-clue4"></p>
-        </div>
-      </article>
-    </section>
-
-    <!-- =========================================================
-         CLUE 5: MESSAGES / ALIAS
-         Answer: terrace / step / edge
-    ========================================================== -->
-    <section class="screen hidden" id="screen-messages">
-      <button class="btn btn-back" data-back>&larr; Back to Case Board</button>
-      <article class="file-sheet">
-        <p class="file-tag">File 05 / Recovered Messages</p>
-        <h2>Deleted Message Fragments</h2>
-        <p>Soto recovered fragments from the event messaging portal. One sender used an alias instead of a name.</p>
-
-        <table class="data-table log-table">
-          <tr><th>Time</th><th>Sender</th><th>Fragment</th></tr>
-          <tr><td>3:21 PM</td><td>Clara</td><td>“I am uploading the corrected NI-2289 notes before rehearsal.”</td></tr>
-          <tr><td>3:29 PM</td><td>terrace_step</td><td>“Do not put that correction in front of donors.”</td></tr>
-          <tr><td>3:34 PM</td><td>Clara</td><td>“Then meet me in the archive and explain the edited summary.”</td></tr>
-          <tr><td>4:44 PM</td><td>terrace_step</td><td>“Delete the temporary folder. The surface is clean now.”</td></tr>
-        </table>
-
-        <div class="note-card">
-          <p><strong>Note found in Adrian's sponsor folder:</strong> “Terrace / step / edge sites — simple surface words for investor speech. Ask Rina to explain before going on stage.”</p>
-          <p class="small-print">The note is not proof by itself. It only links the alias to someone who was trying to borrow research language for a public pitch.</p>
-        </div>
-
-        <div class="answer-box" data-clue="clue5">
-          <label for="input-clue5">What surface-science word reveals the sender's alias?</label>
-          <input id="input-clue5" type="text" placeholder="Enter the keyword" autocomplete="off" />
-          <div class="answer-actions">
-            <button class="btn btn-primary" data-submit="clue5">Submit</button>
-            <button class="btn btn-hint" data-hint="clue5">Hint</button>
-          </div>
-          <p class="hint-text hidden" id="hint-clue5"></p>
-          <p class="feedback" id="feedback-clue5"></p>
-        </div>
-      </article>
-    </section>
-
-    <!-- =========================================================
-         FINAL ACCUSATION
-    ========================================================== -->
-    <section class="screen hidden" id="screen-final">
-      <button class="btn btn-back" data-back>&larr; Back to Case Board</button>
-      <article class="file-sheet">
-        <p class="file-tag">Final File / Verdict</p>
-        <h2>Who is the Murderer?</h2>
-        <p>The website will only accept one name. Accuse someone only if the evidence connects motive, opportunity, and the attempted cover-up.</p>
-
-        <ul class="evidence-list">
-          <li>The body-temperature clue gives the likely death time.</li>
-          <li>The access log contradicts one person's alibi at that time.</li>
-          <li>The raw catalyst record shows who benefited from hiding the correction.</li>
-          <li>The deleted messages connect the same person to a threatening alias.</li>
-          <li>The researcher suspect has access to catalyst material, but the evidence points away from her.</li>
-        </ul>
-
-        <div class="answer-box" data-clue="final">
-          <label for="input-final">Enter the murderer's name:</label>
-          <input id="input-final" type="text" placeholder="Full name" autocomplete="off" />
-          <div class="answer-actions">
-            <button class="btn btn-primary" data-submit="final">Submit accusation</button>
-          </div>
-          <p class="feedback" id="feedback-final"></p>
-        </div>
-      </article>
-    </section>
-
-    <!-- =========================================================
-         ENDING
-    ========================================================== -->
-    <section class="screen hidden" id="screen-ending">
-      <button class="btn btn-back" data-back>&larr; Back to Case Board</button>
-      <article class="file-sheet ending-sheet">
-        <p class="file-tag">Case Closed</p>
-        <h2>Adrian Cole</h2>
-        <p>Adrian Cole killed Clara Bell to stop her from revealing that the clean-energy sponsor story was built on a manipulated catalyst archive. The case is not proven by one clue alone; it is proven by the chain.</p>
-        <p>The Roman numeral lock opened the medical file. The medical file gave a body temperature of 29.65 °C at 11:00 PM. The invitation card placed the death in July, and the physical cooling-rate guide gives July as 1.05 °C/hour. The temperature drop is 7.35 °C, which means approximately 7 hours before the exam: <strong>4:00 PM</strong>.</p>
-        <p>At that time, Adrian claimed he was upstairs on a sponsor call, but the guest-badge log placed him at the archive side exit at 4:02 PM. The sponsor archive then showed that the NI-2289 public label was false and that Adrian's portal was attached to the corrected raw record Clara planned to expose. Finally, the recovered messages tied the threatening alias <span class="inline-code">terrace_step</span> to Adrian's own sponsor notes.</p>
-        <p>Rina is the researcher suspect and had access to catalyst samples, but her clue points to sample preparation, not the murder. Marcus had technical access, and Lila had event pressure, but only Adrian had motive, opportunity, and a cover-up trail.</p>
-        <p class="ending-signoff">CASE STATUS: CLOSED</p>
-      </article>
-    </section>
-  </main>
-
-  <script src="script.js"></script>
+<script src="script.js"></script>
 </body>
 </html>
