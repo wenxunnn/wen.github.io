@@ -51,7 +51,7 @@ const UNLOCKS = {
 */
 const HINTS = {
   clue1: [
-    "VII and IX don't take up the same amount of space when you write them out."
+    "VII and IX don't take up the same amount of space when you write them out.",
     "A 5-character number could be 2 X's + VII, or 3 X's + IX. Work out both options for each blank length, then see which combination makes the ordering (smallest, then largest) actually work.",
   ],
   clue2: [
